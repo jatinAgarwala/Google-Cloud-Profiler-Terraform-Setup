@@ -1,0 +1,196 @@
+[
+  {
+    "name": "profile_uuid",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "Unique identifier generated during upload (optional, can be added by the upload process)"
+  },
+  {
+    "name": "upload_timestamp",
+    "type": "TIMESTAMP",
+    "mode": "REQUIRED",
+    "description": "Timestamp of when the profile was uploaded to BigQuery"
+  },
+  {
+    "name": "profile_type",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "The explicit type of the profile (e.g., CPU, HEAP, HEAP_ALLOC, THREADS, CONTENTION)."
+  },
+  {
+    "name": "time_nanos",
+    "type": "TIMESTAMP",
+    "mode": "NULLABLE",
+    "description": "Time of collection (UTC) converted from nanoseconds past the epoch."
+  },
+  {
+    "name": "duration_nanos",
+    "type": "INTEGER",
+    "mode": "NULLABLE",
+    "description": "Duration of the profile in nanoseconds, if applicable."
+  },
+  {
+    "name": "period_type",
+    "type": "RECORD",
+    "mode": "NULLABLE",
+    "description": "The kind of events between sampled occurrences.",
+    "fields": [
+      {"name": "type", "type": "STRING", "mode": "NULLABLE", "description": "Denormalized string for period type."},
+      {"name": "unit", "type": "STRING", "mode": "NULLABLE", "description": "Denormalized string for period unit."}
+    ]
+  },
+  {
+    "name": "period",
+    "type": "INTEGER",
+    "mode": "NULLABLE",
+    "description": "The number of events between sampled occurrences."
+  },
+  {
+    "name": "comment",
+    "type": "STRING",
+    "mode": "REPEATED",
+    "description": "Denormalized free-form text comments associated with the profile."
+  },
+  {
+    "name": "default_sample_type",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "Denormalized string for the preferred sample type."
+  },
+  {
+    "name": "doc_url",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "Denormalized documentation link string for this profile."
+  },
+  {
+    "name": "drop_frames_pattern",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "Denormalized regex pattern for frames to drop."
+  },
+  {
+    "name": "keep_frames_pattern",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "Denormalized regex pattern for frames to keep."
+  },
+  {
+    "name": "sample_type",
+    "type": "RECORD",
+    "mode": "REPEATED",
+    "description": "A description of the samples associated with each Sample.value.",
+    "fields": [
+      {"name": "type", "type": "STRING", "mode": "NULLABLE", "description": "Denormalized string for sample value type."},
+      {"name": "unit", "type": "STRING", "mode": "NULLABLE", "description": "Denormalized string for sample value unit."}
+    ]
+  },
+  {
+    "name": "sample",
+    "type": "RECORD",
+    "mode": "REPEATED",
+    "description": "The set of samples recorded in this profile.",
+    "fields": [
+      {"name": "location_id", "type": "INTEGER", "mode": "REPEATED", "description": "IDs corresponding to Profile.location.id. Leaf is index 0."},
+      {"name": "value", "type": "INTEGER", "mode": "REPEATED", "description": "Values corresponding to Profile.sample_type."},
+      {
+        "name": "label",
+        "type": "RECORD",
+        "mode": "REPEATED",
+        "description": "Additional context labels for this sample.",
+        "fields": [
+          {"name": "key", "type": "STRING", "mode": "NULLABLE", "description": "Denormalized label key string."},
+          {"name": "str", "type": "STRING", "mode": "NULLABLE", "description": "Denormalized label string value."},
+          {"name": "num", "type": "INTEGER", "mode": "NULLABLE", "description": "Label numeric value."},
+          {"name": "num_unit", "type": "STRING", "mode": "NULLABLE", "description": "Denormalized unit string for the numeric value."}
+        ]
+      }
+    ]
+  },
+  {
+    "name": "mapping",
+    "type": "RECORD",
+    "mode": "REPEATED",
+    "description": "Mapping from address ranges to the image/binary/library.",
+    "fields": [
+      {"name": "id", "type": "INTEGER", "mode": "NULLABLE", "description": "Unique nonzero id for the mapping."},
+      {"name": "memory_start", "type": "INTEGER", "mode": "NULLABLE", "description": "Address at which the binary/DLL is loaded."},
+      {"name": "memory_limit", "type": "INTEGER", "mode": "NULLABLE", "description": "Limit of the address range occupied."},
+      {"name": "file_offset", "type": "INTEGER", "mode": "NULLABLE", "description": "Offset in the binary corresponding to the first mapped address."},
+      {"name": "filename", "type": "STRING", "mode": "NULLABLE", "description": "Denormalized filename string."},
+      {"name": "build_id", "type": "STRING", "mode": "NULLABLE", "description": "Denormalized build ID string."},
+      {"name": "has_functions", "type": "BOOLEAN", "mode": "NULLABLE"},
+      {"name": "has_filenames", "type": "BOOLEAN", "mode": "NULLABLE"},
+      {"name": "has_line_numbers", "type": "BOOLEAN", "mode": "NULLABLE"},
+      {"name": "has_inline_frames", "type": "BOOLEAN", "mode": "NULLABLE"}
+    ]
+  },
+  {
+    "name": "location",
+    "type": "RECORD",
+    "mode": "REPEATED",
+    "description": "Locations referenced by samples.",
+    "fields": [
+      {"name": "id", "type": "INTEGER", "mode": "NULLABLE", "description": "Unique nonzero id for the location."},
+      {"name": "mapping_id", "type": "INTEGER", "mode": "NULLABLE", "description": "ID of the corresponding Profile.Mapping."},
+      {"name": "address", "type": "INTEGER", "mode": "NULLABLE", "description": "Instruction address for this location."},
+      {
+        "name": "line",
+        "type": "RECORD",
+        "mode": "REPEATED",
+        "description": "Line information, potentially including inlined functions.",
+        "fields": [
+          {"name": "function_id", "type": "INTEGER", "mode": "NULLABLE", "description": "ID of the corresponding Profile.Function."},
+          {"name": "line", "type": "INTEGER", "mode": "NULLABLE", "description": "Line number in source code."},
+          {"name": "column", "type": "INTEGER", "mode": "NULLABLE", "description": "Column number in source code."}
+        ]
+      },
+      {"name": "is_folded", "type": "BOOLEAN", "mode": "NULLABLE"}
+    ]
+  },
+  {
+    "name": "function",
+    "type": "RECORD",
+    "mode": "REPEATED",
+    "description": "Functions referenced by locations.",
+    "fields": [
+      {"name": "id", "type": "INTEGER", "mode": "NULLABLE", "description": "Unique nonzero id for the function."},
+      {"name": "name", "type": "STRING", "mode": "NULLABLE", "description": "Denormalized human-readable function name string."},
+      {"name": "system_name", "type": "STRING", "mode": "NULLABLE", "description": "Denormalized system name string (e.g., mangled)."},
+      {"name": "filename", "type": "STRING", "mode": "NULLABLE", "description": "Denormalized source filename string containing the function."},
+      {"name": "start_line", "type": "INTEGER", "mode": "NULLABLE", "description": "Start line number in source file."}
+    ]
+  },
+  {
+    "name": "deployment_project_id",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "Project ID from the original deployment request."
+  },
+    {
+    "name": "deployment_target",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "Target (service name) from the original deployment request."
+  },
+  {
+    "name": "deployment_labels",
+    "type": "RECORD",
+    "mode": "REPEATED",
+    "description": "Key-value labels from the original deployment request.",
+    "fields": [
+        {"name": "key", "type": "STRING", "mode": "NULLABLE"},
+        {"name": "value", "type": "STRING", "mode": "NULLABLE"}
+    ]
+  },
+  {
+    "name": "profile_labels",
+    "type": "RECORD",
+    "mode": "REPEATED",
+    "description": "Key-value labels attached directly to the profile during upload.",
+    "fields": [
+        {"name": "key", "type": "STRING", "mode": "NULLABLE"},
+        {"name": "value", "type": "STRING", "mode": "NULLABLE"}
+    ]
+  }
+]
